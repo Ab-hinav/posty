@@ -1,0 +1,47 @@
+---
+title: "Designing Idempotent APIs from the Ground Up"
+description: "Strategies for ensuring safe retries in distributed systems, moving beyond simple unique keys toward explicit state-machine modeling."
+date: "2026-05-20"
+tags: ["architecture", "backend"]
+difficulty: "intermediate"
+type: "tutorial"
+published: true
+---
+
+> Generalized example. No employer or client implementation detail is disclosed.
+
+## Why idempotency
+
+When a network call fails, the safest client behavior is to retry. But a naive
+retry can double-charge a card or send a notification twice. An **idempotent**
+endpoint guarantees that processing the same request more than once has the same
+effect as processing it exactly once.
+
+## The idempotency key
+
+The client generates a unique key per logical operation and sends it with the
+request. The server records the key with the result of the first attempt and
+replays that result for any later request carrying the same key.
+
+```ts
+async function handle(req: Request) {
+  const key = req.headers.get("Idempotency-Key");
+  const existing = await store.get(key);
+  if (existing) return existing.response; // replay
+  const response = await process(req);
+  await store.put(key, { response });
+  return response;
+}
+```
+
+## Beyond keys: model the state machine
+
+Keys dedupe identical requests, but real reliability comes from modeling the
+operation as an explicit state machine — `pending → committed → settled` — and
+only allowing legal transitions. That way a retry that arrives mid-flight is
+rejected or parked, never double-applied.
+
+## What I learned
+
+The key is the easy part. The hard part is deciding what "the same operation"
+means, and making every transition safe to repeat.

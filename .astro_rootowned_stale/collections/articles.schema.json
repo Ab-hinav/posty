@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "maxLength": 70
+    },
+    "description": {
+      "type": "string",
+      "minLength": 50,
+      "maxLength": 160
+    },
+    "date": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updated": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "tags": {
+      "default": [],
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "difficulty": {
+      "type": "string",
+      "enum": [
+        "beginner",
+        "intermediate",
+        "advanced"
+      ]
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "case-study",
+        "tutorial",
+        "field-note",
+        "ai-workflow"
+      ]
+    },
+    "repo": {
+      "type": "string",
+      "format": "uri"
+    },
+    "published": {
+      "default": false,
+      "type": "boolean"
+    },
+    "$schema": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "title",
+    "description",
+    "date",
+    "difficulty",
+    "type"
+  ]
+}

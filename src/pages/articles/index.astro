@@ -1,0 +1,138 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import FormattedDate from '../../components/FormattedDate.astro';
+import { Input } from '@/components/ui/input';
+import { collectTags, difficultyBadge, getPublishedArticles, readingTime } from '@/lib/articles';
+
+const articles = await getPublishedArticles();
+const tags = collectTags(articles);
+const filters = ['all', ...tags];
+---
+
+<Layout title="Articles · System Journal">
+	<main class="mx-auto w-full max-w-[700px] flex-grow px-md pb-[64px] pt-xl md:px-gutter">
+		<!-- Header -->
+		<div class="mb-xl">
+			<h1
+				class="mb-md font-headline-lg-mobile text-headline-lg-mobile text-on-surface md:font-headline-lg md:text-headline-lg"
+			>
+				Articles
+			</h1>
+
+			<!-- Search -->
+			<div class="relative mb-md w-full">
+				<span
+					class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant"
+				>
+					search
+				</span>
+				<Input
+					id="article-search"
+					type="text"
+					placeholder="Search articles..."
+					className="h-auto rounded-lg border-outline-variant bg-surface-container-lowest py-2 pl-10 pr-4 font-body-md text-body-md"
+				/>
+			</div>
+
+			<!-- Filter pills -->
+			{
+				filters.length > 1 && (
+					<div class="flex flex-wrap gap-2">
+						{filters.map((f) => (
+							<button
+								type="button"
+								data-filter={f}
+								data-active={f === 'all'}
+								class="rounded-full border border-outline-variant px-3 py-1 font-label-sm text-label-sm uppercase text-on-surface-variant transition-colors hover:border-primary/50 hover:bg-primary/5 data-[active=true]:border-primary data-[active=true]:bg-primary/10 data-[active=true]:text-primary"
+							>
+								{f}
+							</button>
+						))}
+					</div>
+				)
+			}
+		</div>
+
+		<!-- Articles list -->
+		<div class="flex flex-col gap-xl">
+			{
+				articles.map((article) => (
+					<article
+						class="article-item group cursor-pointer rounded-xl border border-outline-variant bg-surface-container-lowest p-lg transition-colors hover:border-primary"
+						data-search={`${article.data.title} ${article.data.description} ${article.data.tags.join(' ')}`.toLowerCase()}
+						data-tags={article.data.tags.join(' ').toLowerCase()}
+					>
+						<a href={`/articles/${article.id}/`} class="block">
+							<div class="mb-sm flex flex-wrap items-center gap-2">
+								<span
+									class:list={[
+										'rounded-full px-2 py-0.5 font-label-sm text-label-sm uppercase',
+										difficultyBadge[article.data.difficulty],
+									]}
+								>
+									{article.data.difficulty}
+								</span>
+								<span class="font-label-sm text-label-sm text-on-surface-variant">
+									<FormattedDate date={article.data.date} />
+								</span>
+								<span class="font-label-sm text-label-sm text-on-surface-variant">·</span>
+								<span class="font-label-sm text-label-sm text-on-surface-variant">
+									{readingTime(article.body)}
+								</span>
+							</div>
+							<h2 class="mb-sm font-headline-md text-headline-md text-on-surface transition-colors group-hover:text-primary">
+								{article.data.title}
+							</h2>
+							<p class="mb-md line-clamp-2 font-body-md text-body-md text-on-surface-variant">
+								{article.data.description}
+							</p>
+							<div class="flex flex-wrap gap-2">
+								{article.data.tags.map((tag) => (
+									<span class="rounded-full border border-outline-variant px-2 py-0.5 font-label-sm text-label-sm uppercase text-on-surface-variant">
+										{tag}
+									</span>
+								))}
+							</div>
+						</a>
+					</article>
+				))
+			}
+			<p id="no-results" class="hidden py-xl text-center text-on-surface-variant">
+				No articles match your search.
+			</p>
+		</div>
+	</main>
+</Layout>
+
+<script>
+	const search = document.getElementById('article-search') as HTMLInputElement | null;
+	const pills = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-filter]'));
+	const items = Array.from(document.querySelectorAll<HTMLElement>('.article-item'));
+	const noResults = document.getElementById('no-results');
+	let activeTag = 'all';
+
+	function apply() {
+		const q = (search?.value ?? '').toLowerCase().trim();
+		let visible = 0;
+		for (const el of items) {
+			const text = el.dataset.search ?? '';
+			const tags = (el.dataset.tags ?? '').split(' ');
+			const matchesText = !q || text.includes(q);
+			const matchesTag = activeTag === 'all' || tags.includes(activeTag);
+			const show = matchesText && matchesTag;
+			el.classList.toggle('hidden', !show);
+			if (show) visible++;
+		}
+		noResults?.classList.toggle('hidden', visible !== 0);
+	}
+
+	search?.addEventListener('input', apply);
+	for (const pill of pills) {
+		pill.addEventListener('click', () => {
+			activeTag = pill.dataset.filter ?? 'all';
+			for (const p of pills) p.dataset.active = String(p === pill);
+			apply();
+		});
+	}
+	apply();
+</script>

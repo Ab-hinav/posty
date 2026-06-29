@@ -1,11 +1,10 @@
 ---
-// Import the global.css file here so that it is included on
-// all pages through the use of the <BaseHead /> component.
+// Global <head> metadata, fonts, and the dark-mode bootstrap.
+// Included on every page via the shared Layout.
 import '../styles/global.css';
 import type { ImageMetadata } from 'astro';
 import FallbackImage from '../assets/blog-placeholder-1.jpg';
 import { SITE_TITLE } from '../consts';
-import { Font } from 'astro:assets';
 
 interface Props {
 	title: string;
@@ -17,6 +16,17 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 
 const { title, description, image = FallbackImage } = Astro.props;
 ---
+
+<!-- Set the theme before paint to avoid a flash of the wrong mode -->
+<script is:inline>
+	(() => {
+		const stored = localStorage.getItem('theme');
+		const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+		if (stored === 'dark' || (!stored && prefersDark)) {
+			document.documentElement.classList.add('dark');
+		}
+	})();
+</script>
 
 <!-- Global Metadata -->
 <meta charset="utf-8" />
@@ -32,7 +42,17 @@ const { title, description, image = FallbackImage } = Astro.props;
 />
 <meta name="generator" content={Astro.generator} />
 
-<Font cssVariable="--font-atkinson" preload />
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+	href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,400..700;1,400..700&family=JetBrains+Mono:wght@400;500&display=swap"
+	rel="stylesheet"
+/>
+<link
+	href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap"
+	rel="stylesheet"
+/>
 
 <!-- Canonical URL -->
 <link rel="canonical" href={canonicalURL} />

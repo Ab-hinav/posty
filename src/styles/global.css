@@ -1,141 +1,372 @@
-/*
-  The CSS in this style tag is based off of Bear Blog's default CSS.
-  https://github.com/HermanMartinus/bearblog/blob/297026a877bc2ab2b3bdfbd6b9f7961c350917dd/templates/styles/blog/default.css
-  License MIT: https://github.com/HermanMartinus/bearblog/blob/master/LICENSE.md
- */
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
+@custom-variant dark (&:is(.dark *));
+
+/* ============================================================
+   Studio Workshop theme — Material 3 (teal on warm paper)
+   Light values are from the design; dark values are derived
+   M3 counterparts. Tokens live as CSS vars so dark mode is a
+   single `.dark` class flip; `var()` references resolve live.
+   ============================================================ */
 :root {
-	--accent: #2337ff;
-	--accent-dark: #000d8a;
-	--black: 15, 18, 25;
-	--gray: 96, 115, 159;
-	--gray-light: 229, 233, 240;
-	--gray-dark: 34, 41, 57;
-	--gray-gradient: rgba(var(--gray-light), 50%), #fff;
-	--box-shadow:
-		0 2px 6px rgba(var(--gray), 25%), 0 8px 24px rgba(var(--gray), 33%),
-		0 16px 32px rgba(var(--gray), 33%);
+	/* surfaces */
+	--surface: #fff8f5;
+	--background: #fff8f5;
+	--on-surface: #1e1b18;
+	--on-background: #1e1b18;
+	--surface-variant: #e9e1dc;
+	--on-surface-variant: #3f4848;
+	--surface-bright: #fff8f5;
+	--surface-dim: #e1d8d4;
+	--surface-container-lowest: #ffffff;
+	--surface-container-low: #fbf2ed;
+	--surface-container: #f5ece7;
+	--surface-container-high: #efe6e2;
+	--surface-container-highest: #e9e1dc;
+	/* primary */
+	--primary: #004546;
+	--on-primary: #ffffff;
+	--primary-container: #1a5d5e;
+	--on-primary-container: #96d4d4;
+	/* secondary */
+	--secondary: #715a4c;
+	--on-secondary: #ffffff;
+	--secondary-container: #f9d9c8;
+	--on-secondary-container: #755e50;
+	/* tertiary */
+	--tertiary: #3e3d37;
+	--on-tertiary: #ffffff;
+	--tertiary-container: #56544d;
+	--on-tertiary-container: #ccc8c0;
+	/* error */
+	--error: #ba1a1a;
+	--on-error: #ffffff;
+	--error-container: #ffdad6;
+	--on-error-container: #93000a;
+	/* outlines / inverse */
+	--outline: #6f7979;
+	--outline-variant: #bfc8c8;
+	--inverse-surface: #34302c;
+	--inverse-on-surface: #f8efea;
+	--inverse-primary: #94d1d2;
+	--surface-tint: #276868;
+	/* fixed accent tokens — identical in light & dark by M3 design */
+	--primary-fixed: #afeeee;
+	--primary-fixed-dim: #94d1d2;
+	--on-primary-fixed: #002020;
+	--on-primary-fixed-variant: #014f50;
+	--secondary-fixed: #fcdccb;
+	--secondary-fixed-dim: #dfc0b0;
+	--on-secondary-fixed: #28180e;
+	--on-secondary-fixed-variant: #574236;
+	--tertiary-fixed: #e6e2d9;
+	--tertiary-fixed-dim: #cac6be;
+	--on-tertiary-fixed: #1c1c16;
+	--on-tertiary-fixed-variant: #484740;
+
+	/* dotted page texture */
+	--dot-color: #efe6e2;
+
+	/* shadcn semantic tokens mapped onto the design palette
+	   (var() resolves live, so these follow .dark automatically) */
+	--foreground: var(--on-surface);
+	--card: var(--surface-container-lowest);
+	--card-foreground: var(--on-surface);
+	--popover: var(--surface-container-lowest);
+	--popover-foreground: var(--on-surface);
+	--primary-foreground: var(--on-primary);
+	--secondary-foreground: var(--on-secondary);
+	--muted: var(--surface-container);
+	--muted-foreground: var(--on-surface-variant);
+	--accent: var(--surface-container-high);
+	--accent-foreground: var(--on-surface);
+	--destructive: var(--error);
+	--destructive-foreground: var(--on-error);
+	--border: var(--outline-variant);
+	--input: var(--outline-variant);
+	--ring: var(--primary);
+	--radius: 0.625rem;
 }
-body {
-	font-family: var(--font-atkinson);
-	margin: 0;
-	padding: 0;
-	text-align: left;
-	background: linear-gradient(var(--gray-gradient)) no-repeat;
-	background-size: 100% 600px;
-	word-wrap: break-word;
-	overflow-wrap: break-word;
-	color: rgb(var(--gray-dark));
-	font-size: 20px;
-	line-height: 1.7;
+
+.dark {
+	--surface: #14110f;
+	--background: #14110f;
+	--on-surface: #e9e1dc;
+	--on-background: #e9e1dc;
+	--surface-variant: #3f4848;
+	--on-surface-variant: #bfc8c8;
+	--surface-bright: #3a3633;
+	--surface-dim: #14110f;
+	--surface-container-lowest: #0e0c0b;
+	--surface-container-low: #1c1917;
+	--surface-container: #201d1b;
+	--surface-container-high: #2b2724;
+	--surface-container-highest: #36302d;
+	--primary: #94d1d2;
+	--on-primary: #00373a;
+	--primary-container: #004f50;
+	--on-primary-container: #afeeee;
+	--secondary: #dfc0b0;
+	--on-secondary: #40291c;
+	--secondary-container: #574236;
+	--on-secondary-container: #fcdccb;
+	--tertiary: #cac6be;
+	--on-tertiary: #2f2f29;
+	--tertiary-container: #484740;
+	--on-tertiary-container: #e6e2d9;
+	--error: #ffb4ab;
+	--on-error: #690005;
+	--error-container: #93000a;
+	--on-error-container: #ffdad6;
+	--outline: #899393;
+	--outline-variant: #3f4848;
+	--inverse-surface: #e9e1dc;
+	--inverse-on-surface: #34302c;
+	--inverse-primary: #006a6b;
+	--surface-tint: #94d1d2;
+	--dot-color: #2b2724;
 }
-main {
-	width: 720px;
-	max-width: calc(100% - 2em);
-	margin: auto;
-	padding: 3em 1em;
+
+/* ============================================================
+   Expose tokens as Tailwind utilities (color / font / text /
+   spacing). `inline` so utilities reference the live vars.
+   ============================================================ */
+@theme inline {
+	/* fonts */
+	--font-sans: "Hanken Grotesk", ui-sans-serif, system-ui, sans-serif;
+	--font-mono: "JetBrains Mono", ui-monospace, monospace;
+	--font-body-md: "Hanken Grotesk", ui-sans-serif, system-ui, sans-serif;
+	--font-body-lg: "Hanken Grotesk", ui-sans-serif, system-ui, sans-serif;
+	--font-headline-md: "Hanken Grotesk", ui-sans-serif, system-ui, sans-serif;
+	--font-headline-lg: "Hanken Grotesk", ui-sans-serif, system-ui, sans-serif;
+	--font-headline-lg-mobile: "Hanken Grotesk", ui-sans-serif, system-ui, sans-serif;
+	--font-label-sm: "JetBrains Mono", ui-monospace, monospace;
+	--font-code-block: "JetBrains Mono", ui-monospace, monospace;
+
+	/* type scale */
+	--text-body-md: 18px;
+	--text-body-md--line-height: 1.6;
+	--text-body-md--letter-spacing: 0.01em;
+	--text-body-md--font-weight: 400;
+	--text-body-lg: 20px;
+	--text-body-lg--line-height: 1.7;
+	--text-body-lg--letter-spacing: 0.01em;
+	--text-body-lg--font-weight: 400;
+	--text-label-sm: 12px;
+	--text-label-sm--line-height: 1.4;
+	--text-label-sm--letter-spacing: 0.05em;
+	--text-label-sm--font-weight: 500;
+	--text-headline-md: 24px;
+	--text-headline-md--line-height: 1.3;
+	--text-headline-md--letter-spacing: -0.01em;
+	--text-headline-md--font-weight: 500;
+	--text-headline-lg: 40px;
+	--text-headline-lg--line-height: 1.2;
+	--text-headline-lg--letter-spacing: -0.02em;
+	--text-headline-lg--font-weight: 600;
+	--text-headline-lg-mobile: 32px;
+	--text-headline-lg-mobile--line-height: 1.2;
+	--text-headline-lg-mobile--letter-spacing: -0.02em;
+	--text-headline-lg-mobile--font-weight: 600;
+	--text-code-block: 15px;
+	--text-code-block--line-height: 1.6;
+	--text-code-block--font-weight: 400;
+
+	/* spacing scale from the design */
+	--spacing-xs: 4px;
+	--spacing-sm: 8px;
+	--spacing-md: 16px;
+	--spacing-lg: 24px;
+	--spacing-xl: 40px;
+	--spacing-gutter: 24px;
+	--spacing-unit: 4px;
+	--spacing-stack-sm: 8px;
+	--spacing-stack-md: 16px;
+	--spacing-stack-lg: 32px;
+	--spacing-section-gap: 64px;
+	--spacing-margin-mobile: 16px;
+
+	/* radius scale used by shadcn components */
+	--radius-sm: calc(var(--radius) - 4px);
+	--radius-md: calc(var(--radius) - 2px);
+	--radius-lg: var(--radius);
+	--radius-xl: calc(var(--radius) + 4px);
+
+	/* color utilities — design palette */
+	--color-background: var(--background);
+	--color-on-background: var(--on-background);
+	--color-surface: var(--surface);
+	--color-on-surface: var(--on-surface);
+	--color-surface-variant: var(--surface-variant);
+	--color-on-surface-variant: var(--on-surface-variant);
+	--color-surface-bright: var(--surface-bright);
+	--color-surface-dim: var(--surface-dim);
+	--color-surface-container-lowest: var(--surface-container-lowest);
+	--color-surface-container-low: var(--surface-container-low);
+	--color-surface-container: var(--surface-container);
+	--color-surface-container-high: var(--surface-container-high);
+	--color-surface-container-highest: var(--surface-container-highest);
+	--color-primary: var(--primary);
+	--color-on-primary: var(--on-primary);
+	--color-primary-container: var(--primary-container);
+	--color-on-primary-container: var(--on-primary-container);
+	--color-secondary: var(--secondary);
+	--color-on-secondary: var(--on-secondary);
+	--color-secondary-container: var(--secondary-container);
+	--color-on-secondary-container: var(--on-secondary-container);
+	--color-tertiary: var(--tertiary);
+	--color-on-tertiary: var(--on-tertiary);
+	--color-tertiary-container: var(--tertiary-container);
+	--color-on-tertiary-container: var(--on-tertiary-container);
+	--color-error: var(--error);
+	--color-on-error: var(--on-error);
+	--color-error-container: var(--error-container);
+	--color-on-error-container: var(--on-error-container);
+	--color-outline: var(--outline);
+	--color-outline-variant: var(--outline-variant);
+	--color-inverse-surface: var(--inverse-surface);
+	--color-inverse-on-surface: var(--inverse-on-surface);
+	--color-inverse-primary: var(--inverse-primary);
+	--color-surface-tint: var(--surface-tint);
+	--color-primary-fixed: var(--primary-fixed);
+	--color-primary-fixed-dim: var(--primary-fixed-dim);
+	--color-on-primary-fixed: var(--on-primary-fixed);
+	--color-on-primary-fixed-variant: var(--on-primary-fixed-variant);
+	--color-secondary-fixed: var(--secondary-fixed);
+	--color-secondary-fixed-dim: var(--secondary-fixed-dim);
+	--color-on-secondary-fixed: var(--on-secondary-fixed);
+	--color-on-secondary-fixed-variant: var(--on-secondary-fixed-variant);
+	--color-tertiary-fixed: var(--tertiary-fixed);
+	--color-tertiary-fixed-dim: var(--tertiary-fixed-dim);
+	--color-on-tertiary-fixed: var(--on-tertiary-fixed);
+	--color-on-tertiary-fixed-variant: var(--on-tertiary-fixed-variant);
+
+	/* color utilities — shadcn component tokens */
+	--color-foreground: var(--foreground);
+	--color-card: var(--card);
+	--color-card-foreground: var(--card-foreground);
+	--color-popover: var(--popover);
+	--color-popover-foreground: var(--popover-foreground);
+	--color-primary-foreground: var(--primary-foreground);
+	--color-secondary-foreground: var(--secondary-foreground);
+	--color-muted: var(--muted);
+	--color-muted-foreground: var(--muted-foreground);
+	--color-accent: var(--accent);
+	--color-accent-foreground: var(--accent-foreground);
+	--color-destructive: var(--destructive);
+	--color-destructive-foreground: var(--destructive-foreground);
+	--color-border: var(--border);
+	--color-input: var(--input);
+	--color-ring: var(--ring);
 }
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-	margin: 0 0 0.5rem 0;
-	color: rgb(var(--black));
-	line-height: 1.2;
-}
-h1 {
-	font-size: 3.052em;
-}
-h2 {
-	font-size: 2.441em;
-}
-h3 {
-	font-size: 1.953em;
-}
-h4 {
-	font-size: 1.563em;
-}
-h5 {
-	font-size: 1.25em;
-}
-strong,
-b {
-	font-weight: 700;
-}
-a {
-	color: var(--accent);
-}
-a:hover {
-	color: var(--accent);
-}
-p {
-	margin-bottom: 1em;
-}
-.prose p {
-	margin-bottom: 2em;
-}
-textarea {
-	width: 100%;
-	font-size: 16px;
-}
-input {
-	font-size: 16px;
-}
-table {
-	width: 100%;
-}
-img {
-	max-width: 100%;
-	height: auto;
-	border-radius: 8px;
-}
-code {
-	padding: 2px 5px;
-	background-color: rgb(var(--gray-light));
-	border-radius: 2px;
-}
-pre {
-	padding: 1.5em;
-	border-radius: 8px;
-}
-pre > code {
-	all: unset;
-}
-blockquote {
-	border-left: 4px solid var(--accent);
-	padding: 0 0 0 20px;
-	margin: 0;
-	font-size: 1.333em;
-}
-hr {
-	border: none;
-	border-top: 1px solid rgb(var(--gray-light));
-}
-@media (max-width: 720px) {
-	body {
-		font-size: 18px;
+
+/* ============================================================
+   Base
+   ============================================================ */
+@layer base {
+	* {
+		@apply border-border outline-ring/50;
 	}
-	main {
-		padding: 1em;
+	html {
+		scroll-behavior: smooth;
+	}
+	body {
+		@apply bg-background text-on-surface font-body-md text-body-md antialiased;
+	}
+	h1, h2, h3, h4, h5, h6 {
+		@apply text-on-surface;
+	}
+
+	/* Material Symbols icon font */
+	.material-symbols-outlined {
+		font-family: "Material Symbols Outlined";
+		font-weight: normal;
+		font-style: normal;
+		font-size: 24px;
+		line-height: 1;
+		letter-spacing: normal;
+		text-transform: none;
+		display: inline-block;
+		white-space: nowrap;
+		word-wrap: normal;
+		direction: ltr;
+		-webkit-font-smoothing: antialiased;
+		font-feature-settings: "liga";
+		font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
 	}
 }
 
-.sr-only {
-	border: 0;
-	padding: 0;
-	margin: 0;
-	position: absolute !important;
-	height: 1px;
-	width: 1px;
-	overflow: hidden;
-	/* IE6, IE7 - a 0 height clip, off to the bottom right of the visible 1px box */
-	clip: rect(1px 1px 1px 1px);
-	/* maybe deprecated but we need to support legacy browsers */
-	clip: rect(1px, 1px, 1px, 1px);
-	/* modern browsers, clip-path works inwards from each corner */
-	clip-path: inset(50%);
-	/* added line to stop words getting smushed together (as they go onto separate lines and some screen readers do not understand line feeds as a space */
-	white-space: nowrap;
+/* Dotted "engineering paper" texture (home page) */
+.dotted-bg {
+	background-image: radial-gradient(var(--dot-color) 1px, transparent 1px);
+	background-size: 20px 20px;
+}
+
+/* ============================================================
+   Rendered article body (MDX) — replaces the typography plugin
+   ============================================================ */
+.article-prose {
+	@apply text-body-md text-on-surface-variant;
+}
+.article-prose > * + * {
+	@apply mt-stack-md;
+}
+.article-prose h2 {
+	@apply font-headline-md text-[28px] text-on-surface mt-10 mb-4 border-b border-surface-container-high pb-2;
+	scroll-margin-top: 6rem;
+}
+.article-prose h3 {
+	@apply font-headline-md text-headline-md text-on-surface mt-8 mb-4;
+	scroll-margin-top: 6rem;
+}
+.article-prose h4 {
+	@apply font-headline-md text-body-lg font-semibold text-on-surface mt-6 mb-3;
+}
+.article-prose p {
+	@apply leading-relaxed;
+}
+.article-prose a {
+	@apply text-primary underline decoration-dotted underline-offset-4 hover:decoration-solid transition-all;
+}
+.article-prose ul {
+	@apply list-disc pl-6 flex flex-col gap-2;
+}
+.article-prose ol {
+	@apply list-decimal pl-6 flex flex-col gap-2;
+}
+.article-prose strong {
+	@apply text-on-surface font-semibold;
+}
+.article-prose code {
+	@apply font-code-block bg-surface-container text-on-surface px-1.5 py-0.5 rounded;
+	font-size: 0.9em;
+}
+.article-prose pre {
+	@apply font-code-block text-code-block p-4 rounded-xl overflow-x-auto my-stack-lg border border-outline-variant;
+	background-color: #14110f;
+	color: #e9e1dc;
+}
+.article-prose pre code {
+	@apply bg-transparent p-0 text-inherit;
+	font-size: inherit;
+}
+.article-prose blockquote {
+	@apply border-l-4 border-primary pl-4 italic text-on-surface-variant my-stack-md;
+}
+.article-prose table {
+	@apply w-full border-collapse my-stack-lg text-sm;
+}
+.article-prose th {
+	@apply bg-surface-container-low border border-surface-container-high p-3 text-left font-semibold text-on-surface;
+}
+.article-prose td {
+	@apply border border-surface-container-high p-3 text-on-surface-variant;
+}
+.article-prose img {
+	@apply rounded-xl my-stack-md;
+}
+.article-prose hr {
+	@apply border-outline-variant my-stack-lg;
 }

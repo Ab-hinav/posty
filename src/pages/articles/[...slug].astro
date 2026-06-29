@@ -1,0 +1,124 @@
+---
+import { type CollectionEntry, getCollection, render } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import FormattedDate from '../../components/FormattedDate.astro';
+import { Badge } from '@/components/ui/badge';
+import { Card } from '@/components/ui/card';
+import { difficultyBadge, getPublishedArticles, readingTime } from '@/lib/articles';
+
+export async function getStaticPaths() {
+	// Only published articles get a path; drafts (published: false) 404.
+	const articles = await getCollection('articles', ({ data }) => data.published);
+	return articles.map((article) => ({
+		params: { slug: article.id },
+		props: article,
+	}));
+}
+
+type Props = CollectionEntry<'articles'>;
+
+const article = Astro.props;
+const { Content, headings } = await render(article);
+
+const toc = headings.filter((h) => h.depth === 2 || h.depth === 3);
+const related = (await getPublishedArticles()).filter((a) => a.id !== article.id).slice(0, 3);
+---
+
+<Layout title={`${article.data.title} · System Journal`} description={article.data.description}>
+	<main
+		class="relative mx-auto flex w-full max-w-[1200px] flex-grow flex-col px-md pb-section-gap pt-stack-lg md:px-gutter lg:flex-row"
+	>
+		<!-- Article -->
+		<article class="w-full lg:mx-auto lg:max-w-[700px]">
+			<header class="mb-section-gap">
+				<div class="mb-stack-md flex flex-wrap items-center gap-2">
+					{
+						article.data.tags.map((tag) => (
+							<Badge
+								variant="outline"
+								className="rounded-full px-2 py-1 font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant"
+							>
+								#{tag}
+							</Badge>
+						))
+					}
+					<Badge
+						className={`rounded-full px-2 py-1 font-label-sm text-label-sm font-semibold uppercase tracking-wider ${difficultyBadge[article.data.difficulty]}`}
+					>
+						{article.data.difficulty}
+					</Badge>
+				</div>
+
+				<h1
+					class="mb-stack-md font-headline-lg-mobile text-headline-lg-mobile text-on-surface md:font-headline-lg md:text-headline-lg"
+				>
+					{article.data.title}
+				</h1>
+
+				<div class="flex items-center gap-2 font-label-sm text-label-sm text-secondary">
+					<FormattedDate date={article.data.date} />
+					<span>•</span>
+					<span>{readingTime(article.body)}</span>
+				</div>
+			</header>
+
+			<div class="article-prose">
+				<Content />
+			</div>
+		</article>
+
+		<!-- Table of contents -->
+		{
+			toc.length > 0 && (
+				<aside class="relative ml-12 hidden w-64 flex-shrink-0 xl:block">
+					<div class="sticky top-24 rounded-xl border border-outline-variant bg-surface-container-lowest p-6 shadow-sm">
+						<h4 class="mb-4 font-label-sm text-[12px] font-semibold uppercase tracking-wider text-secondary">
+							Table of Contents
+						</h4>
+						<nav class="flex flex-col gap-3">
+							{toc.map((h) => (
+								<a
+									href={`#${h.slug}`}
+									class:list={[
+										'border-l-2 border-transparent font-body-md transition-colors hover:border-primary hover:text-primary',
+										h.depth === 2 ? 'pl-2 text-[14px] text-on-surface-variant' : 'pl-6 text-[13px] text-secondary',
+									]}
+								>
+									{h.text}
+								</a>
+							))}
+						</nav>
+					</div>
+				</aside>
+			)
+		}
+	</main>
+
+	<!-- Related articles -->
+	{
+		related.length > 0 && (
+			<section class="w-full border-t border-outline-variant bg-surface-container-low py-section-gap">
+				<div class="mx-auto max-w-[1200px] px-md md:px-gutter">
+					<h2 class="mb-stack-lg font-headline-md text-headline-md text-on-surface">Related Articles</h2>
+					<div class="grid grid-cols-1 gap-6 md:grid-cols-3">
+						{related.map((r) => (
+							<a href={`/articles/${r.id}/`} class="group block">
+								<Card className="h-full rounded-xl border border-outline-variant bg-surface-container-lowest p-6 shadow-sm ring-0 transition-all duration-200 hover:border-primary hover:shadow-md">
+									<span class="mb-2 block font-label-sm text-[12px] uppercase text-secondary">
+										{r.data.type} • {readingTime(r.body)}
+									</span>
+									<h3 class="mb-2 font-headline-md text-[18px] font-semibold leading-tight text-on-surface transition-colors group-hover:text-primary">
+										{r.data.title}
+									</h3>
+									<p class="line-clamp-2 font-body-md text-[14px] text-on-surface-variant">
+										{r.data.description}
+									</p>
+								</Card>
+							</a>
+						))}
+					</div>
+				</div>
+			</section>
+		)
+	}
+</Layout>

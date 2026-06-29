@@ -1,0 +1,45 @@
+---
+title: "Understanding Linux cgroups by Building a Container"
+description: "A hands-on introduction to the kernel primitives that make Docker and Kubernetes possible, implemented from scratch in Go."
+date: "2026-04-10"
+tags: ["systems", "linux"]
+difficulty: "beginner"
+type: "tutorial"
+published: true
+---
+
+> Generalized example using toy code. No proprietary detail is disclosed.
+
+## Containers are not magic
+
+A "container" is just a normal Linux process with three things applied to it:
+**namespaces** (what it can see), **cgroups** (what it can use), and a **pivoted
+root filesystem** (where it lives). Understanding cgroups demystifies most of it.
+
+## Namespaces vs cgroups
+
+- **Namespaces** isolate a process's *view* — its own PID tree, network stack,
+  and mounts.
+- **cgroups** limit a process's *resources* — CPU shares, memory ceilings, and
+  I/O bandwidth.
+
+## A minimal "container" in Go
+
+```go
+func main() {
+    cmd := exec.Command("/bin/sh")
+    cmd.SysProcAttr = &syscall.SysProcAttr{
+        Cloneflags: syscall.CLONE_NEWUTS | syscall.CLONE_NEWPID | syscall.CLONE_NEWNS,
+    }
+    cmd.Stdin, cmd.Stdout, cmd.Stderr = os.Stdin, os.Stdout, os.Stderr
+    must(cmd.Run())
+}
+```
+
+Add a memory cgroup by writing a limit to the controller's `memory.max`, move the
+child PID into the group, and the kernel enforces the ceiling for you.
+
+## What I learned
+
+Once you've built one by hand, Docker stops looking like a platform and starts
+looking like ergonomics over a handful of syscalls.
